@@ -1,18 +1,18 @@
 {
   "name": "acm-template-pro-generator",
-  "description": "ACM 示例模板生成器",
+  "description": "ACM DEMO GENERATOR",
   "basePackage": "com.extazy",
   "version": "1.0",
-  "author": "yupi",
-  "createTime": "2023-11-22",
+  "author": "extazy",
+  "createTime": "2024-9-2",
   "fileConfig": {
-    "inputRootPath": "/Users/yupi/Code/yuzi-generator/yuzi-generator-demo-projects/acm-template-pro",
+    "inputRootPath": "D:\\Code\\s1mple-generator\\s1mple-generator-demo-projects\\acm-template-pro",
     "outputRootPath": "generated",
     "type": "dir",
     "files": [
       {
-        "inputPath": "src/com/yupi/acm/MainTemplate.java.ftl",
-        "outputPath": "src/com/yupi/acm/MainTemplate.java",
+        "inputPath": "src/com/extazy/acm/MainTemplate.java.ftl",
+        "outputPath": "src/com/extazy/acm/MainTemplate.java",
         "type": "file",
         "generateType": "dynamic"
       },
@@ -43,7 +43,7 @@
         "fieldName": "author",
         "type": "String",
         "description": "作者注释",
-        "defaultValue": "yupi",
+        "defaultValue": "extazy",
         "abbr": "a"
       },
       {
