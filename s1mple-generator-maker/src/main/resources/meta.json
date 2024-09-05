@@ -6,7 +6,7 @@
   "author": "extazy",
   "createTime": "2024-9-2",
   "fileConfig": {
-    "inputRootPath": "D:\\Code\\s1mple-generator\\s1mple-generator-demo-projects\\acm-template-pro",
+    "inputRootPath": "E:/Develop/s1mple-generator/s1mple-generator-demo-projects/acm-template-pro",
     "outputRootPath": "generated",
     "type": "dir",
     "files": [

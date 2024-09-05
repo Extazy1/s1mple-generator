@@ -1,8 +1,8 @@
-package ${basePackage}.maker.cli.command;
+package ${basePackage}.cli.command;
 
 import cn.hutool.core.bean.BeanUtil;
-import ${basePackage}.maker.generator.file.FileGenerator;
-import ${basePackage}.maker.model.DataModel;
+import ${basePackage}.generator.MainGenerator;
+import ${basePackage}.model.DataModel;
 import lombok.Data;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -22,8 +22,7 @@ public class GenerateCommand implements Callable<Integer> {
     public Integer call() throws Exception {
     DataModel dataModel = new DataModel();
     BeanUtil.copyProperties(this, dataModel);
-    System.out.println("config info：" + dataModel);
-    FileGenerator.doGenerate(dataModel);
+    MainGenerator.doGenerate(dataModel);
     return 0;
     }
 }
