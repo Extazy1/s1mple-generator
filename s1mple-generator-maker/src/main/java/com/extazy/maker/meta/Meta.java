@@ -39,11 +39,11 @@ public class Meta {
     @NoArgsConstructor
     @Data
     public static class ModelConfig {
-        private List<Modelnfo> models;
+        private List<ModelInfo> models;
 
         @NoArgsConstructor
         @Data
-        public static class Modelnfo {
+        public static class ModelInfo {
             private String fieldName;
             private String type;
             private String description;
