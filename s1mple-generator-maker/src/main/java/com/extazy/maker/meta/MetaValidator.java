@@ -1,13 +1,13 @@
 package com.extazy.maker.meta;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.extazy.maker.meta.enums.FileGenerateTypeEnum;
+import com.extazy.maker.meta.enums.FileTypeEnum;
+import com.extazy.maker.meta.enums.ModelTypeEnum;
 
-import java.io.File;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * 元信息校验
@@ -50,7 +50,7 @@ public class MetaValidator {
             fileConfig.setOutputRootPath("generated");
         }
         if (StrUtil.isBlank(fileConfig.getType())) {
-            fileConfig.setType("dir");
+            fileConfig.setType(FileTypeEnum.DIR.getValue());
         }
     }
 
@@ -67,7 +67,7 @@ public class MetaValidator {
             throw new MetaException("未填写 fieldName");
         }
         if (StrUtil.isBlank(modelInfo.getType())) {
-            modelInfo.setType("String");
+            modelInfo.setType(ModelTypeEnum.STRING.getValue());
         }
     }
 
@@ -79,10 +79,10 @@ public class MetaValidator {
             fileInfo.setOutputPath(fileInfo.getInputPath());
         }
         if (StrUtil.isBlank(fileInfo.getType())) {
-            fileInfo.setType(FileUtil.getSuffix(fileInfo.getInputPath()) != null ? "file" : "dir");
+            fileInfo.setType(FileUtil.getSuffix(fileInfo.getInputPath()) == null ? FileTypeEnum.DIR.getValue() : FileTypeEnum.FILE.getValue());
         }
         if (StrUtil.isBlank(fileInfo.getGenerateType())) {
-            fileInfo.setGenerateType(fileInfo.getInputPath().endsWith(".ftl") ? "dynamic" : "static");
+            fileInfo.setGenerateType(fileInfo.getInputPath().endsWith(".ftl") ? FileGenerateTypeEnum.DYNAMIC.getValue() : FileGenerateTypeEnum.STATIC.getValue());
         }
     }
 }
