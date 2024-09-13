@@ -12,17 +12,24 @@
     "type": "dir",
     "files": [
       {
-        "inputPath": "src/com/extazy/acm/MainTemplate.java.ftl",
-        "outputPath": "src/com/extazy/acm/MainTemplate.java",
-        "type": "file",
-        "generateType": "dynamic"
-      },
-      {
-        "inputPath": ".gitignore",
-        "outputPath": ".gitignore",
-        "type": "file",
-        "generateType": "static",
-        "condition": "switchGit"
+        "groupKey" : "git",
+        "groupName" : "托管",
+        "type": "group",
+        "condition" : "switchGit",
+        "files" : [
+          {
+            "inputPath": "src/com/extazy/acm/MainTemplate.java.ftl",
+            "outputPath": "src/com/extazy/acm/MainTemplate.java",
+            "type": "file",
+            "generateType": "dynamic"
+          },
+          {
+            "inputPath": ".gitignore",
+            "outputPath": ".gitignore",
+            "type": "file",
+            "generateType": "static"
+          }
+        ]
       },
       {
         "inputPath": "README.md",

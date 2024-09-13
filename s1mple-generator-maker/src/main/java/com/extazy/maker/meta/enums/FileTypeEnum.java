@@ -5,7 +5,8 @@ package com.extazy.maker.meta.enums;
  */
 public enum FileTypeEnum {
     DIR("目录","dir"),
-    FILE("文件","file");
+    FILE("文件","file"),
+    GROUP("文件组","group");
 
     public final String text;
     public final String value;

@@ -39,7 +39,9 @@ public class MetaValidator {
             return;
         }
         setFileConfigDefaults(fileConfig);
-        fileConfig.getFiles().forEach(MetaValidator::setDefaultFileInfoValues);
+        fileConfig.getFiles().stream() // 使用流来处理集合
+                .filter(fileInfo -> !FileTypeEnum.GROUP.getValue().equals(fileInfo.getType())) // 过滤掉type为group的FileInfo
+                .forEach(MetaValidator::setDefaultFileInfoValues); // 只对非group的FileInfo调用setDefaultFileInfoValues
     }
 
     private static void setFileConfigDefaults(Meta.FileConfig fileConfig) {
