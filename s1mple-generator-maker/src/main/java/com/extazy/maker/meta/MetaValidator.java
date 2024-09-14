@@ -8,6 +8,7 @@ import com.extazy.maker.meta.enums.FileTypeEnum;
 import com.extazy.maker.meta.enums.ModelTypeEnum;
 
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 /**
  * 元信息校验
@@ -61,7 +62,22 @@ public class MetaValidator {
         if (modelConfig == null) {
             return;
         }
-        modelConfig.getModels().forEach(MetaValidator::setDefaultModelInfoValues);
+
+        // Process models with non-empty groupKey
+        modelConfig.getModels().stream()
+                .filter(modelInfo -> StrUtil.isNotBlank(modelInfo.getGroupKey()))
+                .forEach(modelInfo -> {
+                    // Generate intermediate parameters for the group
+                    String allArgsStr = modelInfo.getModels().stream()
+                            .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
+                            .collect(Collectors.joining(", "));
+                    modelInfo.setAllArgsStr(allArgsStr);
+                });
+
+        // Process models with an empty groupKey
+        modelConfig.getModels().stream()
+                .filter(modelInfo -> StrUtil.isBlank(modelInfo.getGroupKey()))
+                .forEach(MetaValidator::setDefaultModelInfoValues);
     }
 
     private static void setDefaultModelInfoValues(Meta.ModelConfig.ModelInfo modelInfo) {
