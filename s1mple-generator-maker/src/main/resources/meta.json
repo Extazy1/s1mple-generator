@@ -8,7 +8,7 @@
   "fileConfig": {
     "inputRootPath": "source/acm-template-pro",
     "outputRootPath": "generated",
-    "sourceRootPath": "D:/Code/s1mple-generator/s1mple-generator-demo-projects/acm-template-pro",
+    "sourceRootPath": "E:/Develop/s1mple-generator/s1mple-generator-demo-projects/acm-template-pro",
     "type": "dir",
     "files": [
       {

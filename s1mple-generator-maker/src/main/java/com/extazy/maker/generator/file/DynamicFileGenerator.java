@@ -1,7 +1,6 @@
 package com.extazy.maker.generator.file;
 
 import cn.hutool.core.io.FileUtil;
-import com.extazy.maker.model.DataModel;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
