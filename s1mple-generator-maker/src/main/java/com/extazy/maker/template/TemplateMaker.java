@@ -13,6 +13,7 @@ import com.extazy.maker.meta.enums.FileTypeEnum;
 import com.extazy.maker.template.enums.FileFilterRangeEnum;
 import com.extazy.maker.template.enums.FileFilterRuleEnum;
 import com.extazy.maker.template.model.FileFilterConfig;
+import com.extazy.maker.template.model.TemplateMakerConfig;
 import com.extazy.maker.template.model.TemplateMakerFileConfig;
 import com.extazy.maker.template.model.TemplateMakerModelConfig;
 
@@ -179,6 +180,23 @@ public class TemplateMaker {
         FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(newMeta), metaOutputPath);
         return id;
     }
+
+    /**
+     * 制作模板
+     *
+     * @param templateMakerConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig templateMakerFileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig templateMakerModelConfig = templateMakerConfig.getModelConfig();
+        Long id = templateMakerConfig.getId();
+
+        return makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
+    }
+
 
     /**
      * 制作文件模板
