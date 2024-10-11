@@ -19,11 +19,11 @@ ${indent}private ${modelInfo.type} ${modelInfo.fieldName}<#if modelInfo.defaultV
 <#-- 生成命令调用 -->
 <#macro generateCommand indent modelInfo>
 ${indent}System.out.println("输入${modelInfo.groupName}配置：");
-${indent}CommandLine commandLine = new CommandLine(${modelInfo.type}Command.class);
-${indent}commandLine.execute(${modelInfo.allArgsStr});
+${indent}CommandLine ${modelInfo.groupKey}CommandLine = new CommandLine(${modelInfo.type}Command.class);
+${indent}${modelInfo.groupKey}CommandLine.execute(${modelInfo.allArgsStr});
 </#macro>
 
-@Command(name = "generate", description = "生成代码", mixinStandardHelpOptions = true)
+@Command(name = "generate", description = "Generate Code", mixinStandardHelpOptions = true)
 @Data
 public class GenerateCommand implements Callable<Integer> {
 <#list modelConfig.models as modelInfo>
