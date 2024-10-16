@@ -7,7 +7,6 @@ public interface FileConstant {
 
     /**
      * COS 访问地址
-     * todo 需替换配置
      */
-    String COS_HOST = "https://extazy.icu";
+    String COS_HOST = "https://s1mple-generator-1324898088";
 }

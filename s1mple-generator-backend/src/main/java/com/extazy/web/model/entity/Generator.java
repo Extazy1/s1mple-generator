@@ -1,12 +1,10 @@
 package com.extazy.web.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.extazy.web.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 代码生成器
@@ -63,7 +61,7 @@ public class Generator implements Serializable {
     private String fileConfig;
 
     /**
-    /**
+     * /**
      * 模型配置（json字符串）
      */
     private String modelConfig;

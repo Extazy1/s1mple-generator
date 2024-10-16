@@ -192,61 +192,65 @@ List
                             ::getUserId).collect(Collectors.toSet());
                             Map
                             <Long
-                            , List
+                                    , List
                             <User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                                 .collect(Collectors.groupingBy(User::getId));
                                 // 2. 已登录，获取用户点赞、收藏状态
                                 Map
                                 <Long
-                                , Boolean> ${dataKey}IdHasThumbMap = new HashMap<>();
-                                Map
-                                <Long
-                                , Boolean> ${dataKey}IdHasFavourMap = new HashMap<>();
-                                User loginUser = userService.getLoginUserPermitNull(request);
-                                if (loginUser != null) {
-                                Set
-                                <Long> ${dataKey}IdSet = ${dataKey}List.stream().map(${upperDataKey}
-                                    ::getId).collect(Collectors.toSet());
-                                    loginUser = userService.getLoginUser(request);
-                                    // 获取点赞
-                                    QueryWrapper
-                                    <${upperDataKey}Thumb> ${dataKey}ThumbQueryWrapper = new QueryWrapper<>();
-                                        ${dataKey}ThumbQueryWrapper.in("${dataKey}Id", ${dataKey}IdSet);
-                                        ${dataKey}ThumbQueryWrapper.eq("userId", loginUser.getId());
-                                        List
-                                        <${upperDataKey}Thumb> ${dataKey}${upperDataKey}ThumbList = ${dataKey}
-                                            ThumbMapper.selectList(${dataKey}ThumbQueryWrapper);
-                                            ${dataKey}${upperDataKey}ThumbList.forEach(${dataKey}${upperDataKey}Thumb
-                                            -> ${dataKey}IdHasThumbMap.put(${dataKey}${upperDataKey}
-                                            Thumb.get${upperDataKey}Id(), true));
-                                            // 获取收藏
+                                        , Boolean> ${dataKey}IdHasThumbMap = new HashMap<>();
+                                    Map
+                                    <Long
+                                            , Boolean> ${dataKey}IdHasFavourMap = new HashMap<>();
+                                        User loginUser = userService.getLoginUserPermitNull(request);
+                                        if (loginUser != null) {
+                                        Set
+                                        <Long> ${dataKey}IdSet = ${dataKey}List.stream().map(${upperDataKey}
+                                            ::getId).collect(Collectors.toSet());
+                                            loginUser = userService.getLoginUser(request);
+                                            // 获取点赞
                                             QueryWrapper
-                                            <${upperDataKey}Favour> ${dataKey}FavourQueryWrapper = new QueryWrapper<>();
-                                                ${dataKey}FavourQueryWrapper.in("${dataKey}Id", ${dataKey}IdSet);
-                                                ${dataKey}FavourQueryWrapper.eq("userId", loginUser.getId());
+                                            <${upperDataKey}Thumb> ${dataKey}ThumbQueryWrapper = new QueryWrapper<>();
+                                                ${dataKey}ThumbQueryWrapper.in("${dataKey}Id", ${dataKey}IdSet);
+                                                ${dataKey}ThumbQueryWrapper.eq("userId", loginUser.getId());
                                                 List
-                                                <${upperDataKey}Favour> ${dataKey}FavourList = ${dataKey}
-                                                    FavourMapper.selectList(${dataKey}FavourQueryWrapper);
-                                                    ${dataKey}FavourList.forEach(${dataKey}Favour -> ${dataKey}
-                                                    IdHasFavourMap.put(${dataKey}Favour.get${upperDataKey}Id(), true));
-                                                    }
-                                                    // 填充信息
-                                                    ${dataKey}VOList.forEach(${dataKey}VO -> {
-                                                    Long userId = ${dataKey}VO.getUserId();
-                                                    User user = null;
-                                                    if (userIdUserListMap.containsKey(userId)) {
-                                                    user = userIdUserListMap.get(userId).get(0);
-                                                    }
-                                                    ${dataKey}VO.setUser(userService.getUserVO(user));
-                                                    ${dataKey}VO.setHasThumb(${dataKey}
-                                                    IdHasThumbMap.getOrDefault(${dataKey}VO.getId(), false));
-                                                    ${dataKey}VO.setHasFavour(${dataKey}
-                                                    IdHasFavourMap.getOrDefault(${dataKey}VO.getId(), false));
-                                                    });
-                                                    // endregion
+                                                <${upperDataKey}Thumb> ${dataKey}${upperDataKey}ThumbList = ${dataKey}
+                                                    ThumbMapper.selectList(${dataKey}ThumbQueryWrapper);
+                                                    ${dataKey}${upperDataKey}ThumbList.forEach(${dataKey}${upperDataKey}
+                                                    Thumb
+                                                    -> ${dataKey}IdHasThumbMap.put(${dataKey}${upperDataKey}
+                                                    Thumb.get${upperDataKey}Id(), true));
+                                                    // 获取收藏
+                                                    QueryWrapper
+                                                    <${upperDataKey}Favour> ${dataKey}FavourQueryWrapper = new
+                                                        QueryWrapper<>();
+                                                        ${dataKey}FavourQueryWrapper.in("${dataKey}Id", ${dataKey}
+                                                        IdSet);
+                                                        ${dataKey}FavourQueryWrapper.eq("userId", loginUser.getId());
+                                                        List
+                                                        <${upperDataKey}Favour> ${dataKey}FavourList = ${dataKey}
+                                                            FavourMapper.selectList(${dataKey}FavourQueryWrapper);
+                                                            ${dataKey}FavourList.forEach(${dataKey}Favour -> ${dataKey}
+                                                            IdHasFavourMap.put(${dataKey}Favour.get${upperDataKey}Id(),
+                                                            true));
+                                                            }
+                                                            // 填充信息
+                                                            ${dataKey}VOList.forEach(${dataKey}VO -> {
+                                                            Long userId = ${dataKey}VO.getUserId();
+                                                            User user = null;
+                                                            if (userIdUserListMap.containsKey(userId)) {
+                                                            user = userIdUserListMap.get(userId).get(0);
+                                                            }
+                                                            ${dataKey}VO.setUser(userService.getUserVO(user));
+                                                            ${dataKey}VO.setHasThumb(${dataKey}
+                                                            IdHasThumbMap.getOrDefault(${dataKey}VO.getId(), false));
+                                                            ${dataKey}VO.setHasFavour(${dataKey}
+                                                            IdHasFavourMap.getOrDefault(${dataKey}VO.getId(), false));
+                                                            });
+                                                            // endregion
 
-                                                    ${dataKey}VOPage.setRecords(${dataKey}VOList);
-                                                    return ${dataKey}VOPage;
-                                                    }
+                                                            ${dataKey}VOPage.setRecords(${dataKey}VOList);
+                                                            return ${dataKey}VOPage;
+                                                            }
 
-                                                    }
+                                                            }
