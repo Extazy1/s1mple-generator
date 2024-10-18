@@ -1,6 +1,8 @@
 package com.extazy;
 
+import com.extazy.maker.generator.Main.GenerateTemplate;
 import com.extazy.maker.generator.Main.MainGenerator;
+import com.extazy.maker.generator.Main.ZipGenerator;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -10,9 +12,11 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
-        MainGenerator mainGenerator = new MainGenerator();
-        mainGenerator.doGenerate();
+//        GenerateTemplate generateTemplate = new MainGenerator();
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        generateTemplate.doGenerate();
     }
 }
+
 
 
