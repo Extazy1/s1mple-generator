@@ -66,3 +66,41 @@ VALUES ('Generator1', '描述1', 'com.example.base', '1.0.0', 'Author1', '["tag1
        ('Generator4', '描述4', 'com.example.base', '1.0.3', 'Author4', '["tag7", "tag8"]', 'picture_url4',
         '{"config4": "value4"}', '{"model4": "value4"}', '/path/to/dist4', 0, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
         0);
+
+INSERT INTO my_db.generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
+                             modelConfig, distPath, status, userId, createTime, updateTime, isDelete)
+VALUES (18, 'acm-template-pro-generator', 'ACM 示例模板生成器', 'com.extazy', '1.0', 'extazy', '["Java"]',
+        'https://s1mple-generator-1324898088.cos.ap-guangzhou.myqcloud.com/2.png', '{
+    "files": [
+      {
+        "groupKey": "git",
+        "groupName": "开源",
+        "type": "group",
+        "condition": "needGit",
+        "files": [
+          {
+            "inputPath": ".gitignore",
+            "outputPath": ".gitignore",
+            "type": "file",
+            "generateType": "static"
+          },
+          {
+            "inputPath": "README.md",
+            "outputPath": "README.md",
+            "type": "file",
+            "generateType": "static"
+          }
+        ]
+      },
+      {
+        "inputPath": "src/com/extazy/acm/MainTemplate.java.ftl",
+        "outputPath": "src/com/extazy/acm/MainTemplate.java",
+        "type": "file",
+        "generateType": "dynamic"
+      }
+    ]
+  }',
+        '{"models":[{"fieldName":"needGit","type":"boolean","description":"是否生成 .gitignore 文件","defaultValue":true},{"fieldName":"loop","type":"boolean","description":"是否生成循环","defaultValue":false,"abbr":"l"},{"type":"MainTemplate","description":"用于生成核心模板文件","groupKey":"mainTemplate","groupName":"核心模板","models":[{"fieldName":"author","type":"String","description":"作者注释","defaultValue":"extazy","abbr":"a"},{"fieldName":"outputText","type":"String","description":"输出信息","defaultValue":"sum = ","abbr":"o"}],"condition":"loop"}]}',
+        '/generator_dist/1844653482369851394/acm-template-pro-generator-dist.zip', 0, 1840316301899640832,
+        '2024-10-18 10:00:17', '2024-10-18 18:50:12', 0);
+
