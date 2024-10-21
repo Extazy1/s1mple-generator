@@ -13,6 +13,8 @@ import {ProFormItem} from '@ant-design/pro-form';
 import {history} from '@umijs/max';
 import {message, UploadFile} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
+import ModelConfigForm from "@/pages/Generator/Add/Components/ModelConfigForm";
+import {values} from "lodash";
 
 /**
  * 创建生成器页面
@@ -115,6 +117,7 @@ const GeneratorAddPage: React.FC = () => {
     }
 
     if (id) {
+      // @ts-ignore
       await doUpdate({
         id,
         ...values,
@@ -149,8 +152,14 @@ const GeneratorAddPage: React.FC = () => {
           <StepsForm.StepForm name="fileConfig" title="文件配置">
             {/* todo 待补充 */}
           </StepsForm.StepForm>
-          <StepsForm.StepForm name="modelConfig" title="模型配置">
-            {/* todo 待补充 */}
+          <StepsForm.StepForm
+            name="modelConfig"
+            title="模型配置"
+            onFinish={async (values) => {
+              console.log(values);
+            }}
+          >
+            <ModelConfigForm formRef={undefined} oldData={undefined} />
           </StepsForm.StepForm>
           <StepsForm.StepForm name="dist" title="生成器文件">
             <ProFormItem label="产物包" name="distPath">
