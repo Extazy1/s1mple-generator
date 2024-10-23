@@ -1,7 +1,7 @@
 package com.extazy.web.model.dto.generator;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.extazy.web.meta.Meta;
+import com.extazy.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;

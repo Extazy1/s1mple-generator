@@ -14,7 +14,6 @@ import {history} from '@umijs/max';
 import {message, UploadFile} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import ModelConfigForm from "@/pages/Generator/Add/Components/ModelConfigForm";
-import {values} from "lodash";
 
 /**
  * 创建生成器页面

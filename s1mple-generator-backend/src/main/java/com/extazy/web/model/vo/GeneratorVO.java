@@ -1,7 +1,7 @@
 package com.extazy.web.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.extazy.web.meta.Meta;
+import com.extazy.maker.meta.Meta;
 import com.extazy.web.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
