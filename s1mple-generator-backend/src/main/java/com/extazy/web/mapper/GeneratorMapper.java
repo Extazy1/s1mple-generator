@@ -2,6 +2,9 @@ package com.extazy.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.extazy.web.model.entity.Generator;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author Admin
@@ -11,7 +14,10 @@ import com.extazy.web.model.entity.Generator;
  */
 public interface GeneratorMapper extends BaseMapper<Generator> {
 
+    @Select("SELECT id, distPath FROM generator WHERE isDelete = 1")
+    List<Generator> listDeletedGenerator();
 }
+
 
 
 

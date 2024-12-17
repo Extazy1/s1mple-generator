@@ -1,6 +1,6 @@
 import FileUploader from '@/components/FileUploader';
 import PictureUploader from '@/components/PictureUploader';
-import { COS_HOST } from '@/constants';
+import {COS_HOST} from '@/constants';
 import FileConfigForm from '@/pages/Generator/Add/components/FileConfigForm';
 import GeneratorMaker from '@/pages/Generator/Add/components/GeneratorMaker';
 import ModelConfigForm from '@/pages/Generator/Add/components/ModelConfigForm';
@@ -9,19 +9,13 @@ import {
   editGeneratorUsingPost,
   getGeneratorVoByIdUsingGet,
 } from '@/services/backend/generatorController';
-import { useSearchParams } from '@@/exports';
-import type { ProFormInstance } from '@ant-design/pro-components';
-import {
-  ProCard,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  StepsForm,
-} from '@ant-design/pro-components';
-import { ProFormItem } from '@ant-design/pro-form';
-import { history } from '@umijs/max';
-import { message, UploadFile } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import {useSearchParams} from '@@/exports';
+import type {ProFormInstance} from '@ant-design/pro-components';
+import {ProCard, ProFormSelect, ProFormText, ProFormTextArea, StepsForm,} from '@ant-design/pro-components';
+import {ProFormItem} from '@ant-design/pro-form';
+import {history} from '@umijs/max';
+import {message, UploadFile} from 'antd';
+import React, {useEffect, useRef, useState} from 'react';
 
 /**
  * 创建生成器页面
@@ -138,70 +132,70 @@ const GeneratorAddPage: React.FC = () => {
   };
 
   return (
-      <ProCard>
-        {/* 创建或者已加载要更新的数据时，才渲染表单，顺利填充默认值 */}
-        {(!id || oldData) && (
-            <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
-                formRef={formRef}
-                formProps={{
-                  initialValues: oldData,
-                }}
-                onFinish={doSubmit}
-            >
-              <StepsForm.StepForm
-                  name="base"
-                  title="基本信息"
-                  onFinish={async (values) => {
-                    setBasicInfo(values);
-                    return true;
-                  }}
-              >
-                <ProFormText name="name" label="名称" placeholder="请输入名称" />
-                <ProFormTextArea name="description" label="描述" placeholder="请输入描述" />
-                <ProFormText name="basePackage" label="基础包" placeholder="请输入基础包" />
-                <ProFormText name="version" label="版本" placeholder="请输入版本" />
-                <ProFormText name="author" label="作者" placeholder="请输入作者" />
-                <ProFormSelect label="标签" mode="tags" name="tags" placeholder="请输入标签列表" />
-                <ProFormItem label="图片" name="picture">
-                  <PictureUploader biz="generator_picture" />
-                </ProFormItem>
-              </StepsForm.StepForm>
-              <StepsForm.StepForm
-                  name="modelConfig"
-                  title="模型配置"
-                  onFinish={async (values) => {
-                    setModelConfig(values);
-                    return true;
-                  }}
-              >
-                <ModelConfigForm formRef={formRef} oldData={oldData} />
-              </StepsForm.StepForm>
-              <StepsForm.StepForm
-                  name="fileConfig"
-                  title="文件配置"
-                  onFinish={async (values) => {
-                    setFileConfig(values);
-                    return true;
-                  }}
-              >
-                <FileConfigForm formRef={formRef} oldData={oldData} />
-              </StepsForm.StepForm>
-              <StepsForm.StepForm name="dist" title="生成器文件">
-                <ProFormItem label="产物包" name="distPath">
-                  <FileUploader biz="generator_dist" description="请上传生成器文件压缩包" />
-                </ProFormItem>
+    <ProCard>
+      {/* 创建或者已加载要更新的数据时，才渲染表单，顺利填充默认值 */}
+      {(!id || oldData) && (
+        <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
+          formRef={formRef}
+          formProps={{
+            initialValues: oldData,
+          }}
+          onFinish={doSubmit}
+        >
+          <StepsForm.StepForm
+            name="base"
+            title="基本信息"
+            onFinish={async (values) => {
+              setBasicInfo(values);
+              return true;
+            }}
+          >
+            <ProFormText name="name" label="名称" placeholder="请输入名称" />
+            <ProFormTextArea name="description" label="描述" placeholder="请输入描述" />
+            <ProFormText name="basePackage" label="基础包" placeholder="请输入基础包" />
+            <ProFormText name="version" label="版本" placeholder="请输入版本" />
+            <ProFormText name="author" label="作者" placeholder="请输入作者" />
+            <ProFormSelect label="标签" mode="tags" name="tags" placeholder="请输入标签列表" />
+            <ProFormItem label="图片" name="picture">
+              <PictureUploader biz="generator_picture" />
+            </ProFormItem>
+          </StepsForm.StepForm>
+          <StepsForm.StepForm
+            name="modelConfig"
+            title="模型配置"
+            onFinish={async (values) => {
+              setModelConfig(values);
+              return true;
+            }}
+          >
+            <ModelConfigForm formRef={formRef} oldData={oldData} />
+          </StepsForm.StepForm>
+          <StepsForm.StepForm
+            name="fileConfig"
+            title="文件配置"
+            onFinish={async (values) => {
+              setFileConfig(values);
+              return true;
+            }}
+          >
+            <FileConfigForm formRef={formRef} oldData={oldData} />
+          </StepsForm.StepForm>
+          <StepsForm.StepForm name="dist" title="生成器文件">
+            <ProFormItem label="产物包" name="distPath">
+              <FileUploader biz="generator_dist" description="请上传生成器文件压缩包" />
+            </ProFormItem>
 
-                <GeneratorMaker
-                    meta={{
-                      ...basicInfo,
-                      ...modelConfig,
-                      ...fileConfig,
-                    }}
-                />
-              </StepsForm.StepForm>
-            </StepsForm>
-        )}
-      </ProCard>
+            <GeneratorMaker
+              meta={{
+                ...basicInfo,
+                ...modelConfig,
+                ...fileConfig,
+              }}
+            />
+          </StepsForm.StepForm>
+        </StepsForm>
+      )}
+    </ProCard>
   );
 };
 
