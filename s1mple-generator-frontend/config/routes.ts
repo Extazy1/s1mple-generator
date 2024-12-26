@@ -51,6 +51,13 @@ export default [
       },
     ],
   },
+  // {
+  //   path: '/test',
+  //   icon: 'home',
+  //   component: './testpage',
+  //   name: 'test',
+  //   hideInMenu: true,
+  // },
   { path: '/', redirect: '/welcome' },
   { path: '*', layout: false, component: './404' },
 ];

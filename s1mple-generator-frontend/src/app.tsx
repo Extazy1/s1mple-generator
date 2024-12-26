@@ -29,7 +29,7 @@ export async function getInitialState(): Promise<InitialState> {
     // 模拟登录用户
     // const mockUser: API.LoginUserVO = {
     //   userAvatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-    //   userName: 'yupi',
+    //   userName: 'extazy',
     //   userRole: 'admin',
     // };
     // initialState.currentUser = mockUser;
@@ -47,9 +47,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         return <AvatarDropdown />;
       },
     },
-    waterMarkProps: {
-      content: initialState?.currentUser?.userName,
-    },
+    //开关水印
+    // waterMarkProps: {
+    //   content: initialState?.currentUser?.userName,
+    // },
     footerRender: () => <Footer />,
     menuHeaderRender: undefined,
     // 自定义 403 页面
