@@ -5,8 +5,10 @@ import {PlusOutlined} from '@ant-design/icons';
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, message, Select, Space, Tag, Typography} from 'antd';
+import {Button, message, Select, Space, Tag, Tooltip, Typography} from 'antd';
 import React, {useRef, useState} from 'react';
+import { FolderOutlined } from '@ant-design/icons';
+import JsonPreview from '@/components/JsonPreview';
 
 /**
  * 生成器管理页面
@@ -18,6 +20,7 @@ const GeneratorAdminPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  //获取表格实例，用于在修改表格后进行刷新
   const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.Generator>();
@@ -54,33 +57,39 @@ const GeneratorAdminPage: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      align: 'center',
     },
     {
       title: '名称',
       dataIndex: 'name',
       valueType: 'text',
+      align: 'center',
     },
     {
       title: '描述',
       dataIndex: 'description',
       valueType: 'textarea',
+      align: 'left',
     },
     {
       title: '基础包',
       dataIndex: 'basePackage',
       valueType: 'text',
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '版本',
       dataIndex: 'version',
       valueType: 'text',
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '作者',
       dataIndex: 'author',
       valueType: 'text',
+      align: 'center',
     },
     {
       title: '标签',
@@ -96,27 +105,66 @@ const GeneratorAdminPage: React.FC = () => {
           return <></>;
         }
         return JSON.parse(record.tags).map((tag: string) => {
-          return <Tag key={tag}>{tag}</Tag>;
+          return (
+            <Tag key={tag} color="blue" style={{ marginRight: 4 }}>
+              {tag}
+            </Tag>
+          );
         });
       },
+      align: 'center',
     },
     {
       title: '文件配置',
       dataIndex: 'fileConfig',
-      valueType: 'jsonCode',
       hideInSearch: true,
+      render: (_, record) => {
+        const { fileConfig } = record;
+        return fileConfig ? (
+          <JsonPreview jsonString={fileConfig} maxLength={60} title="文件配置详情" />
+        ) : (
+          <Typography.Text type="secondary">无</Typography.Text>
+        );
+      },
+      align: 'center',
     },
     {
       title: '模型配置',
       dataIndex: 'modelConfig',
-      valueType: 'jsonCode',
       hideInSearch: true,
+      render: (_, record) => {
+        const { modelConfig } = record;
+        return modelConfig ? (
+          <JsonPreview jsonString={modelConfig} maxLength={60} title="模型配置详情" />
+        ) : (
+          <Typography.Text type="secondary">无</Typography.Text>
+        );
+      },
+      align: 'center',
     },
     {
       title: '输出路径',
       dataIndex: 'distPath',
-      valueType: 'text',
       hideInSearch: true,
+      render: (_, record) => {
+        const { distPath } = record;
+        if (!distPath) {
+          return <Typography.Text type="secondary">无</Typography.Text>;
+        }
+        return (
+          <Tooltip title={distPath}>
+            <Typography.Link
+              style={{ maxWidth: 150, display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              href={distPath.startsWith('http') ? distPath : undefined}
+              target="_blank"
+            >
+              <FolderOutlined style={{ marginRight: 4 }} />
+              {distPath}
+            </Typography.Link>
+          </Tooltip>
+        );
+      },
+      align: 'center',
     },
     {
       title: '图片',
@@ -124,8 +172,10 @@ const GeneratorAdminPage: React.FC = () => {
       valueType: 'image',
       fieldProps: {
         width: 64,
+        style: { borderRadius: 4, objectFit: 'cover', margin: '0 auto' },
       },
       hideInSearch: true,
+      align: 'center',
     },
     {
       title: '状态',
@@ -133,14 +183,21 @@ const GeneratorAdminPage: React.FC = () => {
       valueEnum: {
         0: {
           text: '默认',
+          status: 'Default',
         },
+        // 1: {
+        //   text: '未知',
+        //   status: 'Undefined',
+        // },
       },
+      align: 'center',
     },
     {
       title: '创建用户',
       dataIndex: 'userId',
       valueType: 'text',
       hideInForm: true,
+      align: 'center',
     },
     {
       title: '创建时间',
@@ -149,6 +206,7 @@ const GeneratorAdminPage: React.FC = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       hideInForm: true,
+      align: 'center',
     },
     {
       title: '更新时间',
@@ -157,6 +215,7 @@ const GeneratorAdminPage: React.FC = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       hideInForm: true,
+      align: 'center',
     },
     {
       title: '操作',
@@ -177,8 +236,10 @@ const GeneratorAdminPage: React.FC = () => {
           </Typography.Link>
         </Space>
       ),
+      align: 'center',
     },
   ];
+
   return (
     <div className="generator-admin-page">
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
