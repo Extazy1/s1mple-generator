@@ -1,6 +1,6 @@
-import { FileOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Descriptions, DescriptionsProps, Divider } from 'antd';
 import React from 'react';
+import { Descriptions, DescriptionsProps, Card, Collapse, Space, Tag } from 'antd';
+import { FileOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 interface Props {
   data: API.GeneratorVO;
@@ -12,132 +12,130 @@ interface Props {
  */
 const FileConfig: React.FC<Props> = (props) => {
   const { data } = props;
-
   const fileConfig = data?.fileConfig;
+
   if (!fileConfig) {
-    return <></>;
+    return null;
   }
 
-  const items: DescriptionsProps['items'] = [
+  /**
+   * 渲染文件或分组列表
+   */
+  const renderFileList = (files?: API.FileInfo[]) => {
+    if (!files || files.length === 0) {
+      return <p style={{ color: '#999' }}>暂无文件配置</p>;
+    }
+
+    return (
+      <Collapse
+        bordered={false}
+        style={{ backgroundColor: '#fff' }}
+        accordion
+      >
+        {files.map((file, index) => {
+          // 如果是分组
+          if (file.groupKey) {
+            return (
+              <Collapse.Panel
+                key={index}
+                header={
+                  <Space>
+                    <Tag color="blue">{file.groupKey}</Tag>
+                    {file.groupName}
+                  </Space>
+                }
+              >
+                <Descriptions column={1} size="small" bordered>
+                  <Descriptions.Item label="分组 key">{file.groupKey}</Descriptions.Item>
+                  <Descriptions.Item label="分组名">{file.groupName}</Descriptions.Item>
+                  <Descriptions.Item label="条件">{file.condition}</Descriptions.Item>
+                  <Descriptions.Item label="组内文件">
+                    {renderFileList(file.files)}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Collapse.Panel>
+            );
+          }
+
+          // 如果是单个文件
+          return (
+            <Collapse.Panel
+              key={index}
+              header={
+                <Space>
+                  <FileOutlined />
+                  {file.inputPath || '未命名文件'}
+                </Space>
+              }
+            >
+              <Descriptions column={1} size="small" bordered>
+                <Descriptions.Item label="输入路径">{file.inputPath}</Descriptions.Item>
+                <Descriptions.Item label="输出路径">{file.outputPath}</Descriptions.Item>
+                <Descriptions.Item label="文件类别">{file.type}</Descriptions.Item>
+                <Descriptions.Item label="文件生成类别">
+                  {file.generateType}
+                </Descriptions.Item>
+                <Descriptions.Item label="条件">{file.condition}</Descriptions.Item>
+              </Descriptions>
+            </Collapse.Panel>
+          );
+        })}
+      </Collapse>
+    );
+  };
+
+  const basicInfoItems: DescriptionsProps['items'] = [
     {
       key: 'inputRootPath',
       label: '输入根路径',
-      children: <p>{fileConfig.inputRootPath}</p>,
+      children: fileConfig.inputRootPath || '-',
     },
     {
       key: 'outputRootPath',
       label: '输出根路径',
-      children: <p>{fileConfig.outputRootPath}</p>,
+      children: fileConfig.outputRootPath || '-',
     },
     {
       key: 'sourceRootPath',
       label: '项目根路径',
-      children: <p>{fileConfig.sourceRootPath}</p>,
+      children: fileConfig.sourceRootPath || '-',
     },
     {
       key: 'type',
       label: '文件类别',
-      children: <p>{fileConfig.type}</p>,
+      children: fileConfig.type || '-',
     },
   ];
 
-  const fileListView = (files?: API.FileInfo[]) => {
-    if (!files) {
-      return <></>;
-    }
-
-    return (
-      <>
-        {files.map((file, index) => {
-          // 是分组
-          if (file.groupKey) {
-            const groupFileItems: DescriptionsProps['items'] = [
-              {
-                key: 'groupKey',
-                label: '分组key',
-                children: <p>{file.groupKey}</p>,
-              },
-              {
-                key: 'groupName',
-                label: '分组名',
-                children: <p>{file.groupName}</p>,
-              },
-              {
-                key: 'condition',
-                label: '条件',
-                children: <p>{file.condition}</p>,
-              },
-              {
-                key: 'files',
-                label: '组内文件',
-                children: <p>{fileListView(file.files)}</p>,
-              },
-            ];
-
-            return (
-              <Descriptions key={index} column={1} title={file.groupName} items={groupFileItems} />
-            );
-          }
-
-          const fileItems: DescriptionsProps['items'] = [
-            {
-              key: 'inputPath',
-              label: '输入路径',
-              children: <p>{file.inputPath}</p>,
-            },
-            {
-              key: 'outputPath',
-              label: '输出路径',
-              children: <p>{file.outputPath}</p>,
-            },
-            {
-              key: 'type',
-              label: '文件类别',
-              children: <p>{file.type}</p>,
-            },
-            {
-              key: 'generateType',
-              label: '文件生成类别',
-              children: <p>{file.generateType}</p>,
-            },
-            {
-              key: 'condition',
-              label: '条件',
-              children: <p>{file.condition}</p>,
-            },
-          ];
-
-          return (
-            <>
-              <Descriptions column={2} key={index} items={fileItems} />
-              <Divider />
-            </>
-          );
-        })}
-      </>
-    );
-  };
-
   return (
     <div>
-      <Descriptions
+      <Card
         title={
-          <>
-            <InfoCircleOutlined /> 基本信息
-          </>
+          <Space>
+            <InfoCircleOutlined />
+            <span>基本信息</span>
+          </Space>
         }
-        column={2}
-        items={items}
-      />
-      <div style={{ marginBottom: 16 }} />
-      <Descriptions
+        style={{ marginBottom: 24 }}
+      >
+        <Descriptions
+          bordered
+          size="small"
+          column={1}
+          items={basicInfoItems}
+        />
+      </Card>
+
+      <Card
         title={
-          <>
-            <FileOutlined /> 文件列表
-          </>
+          <Space>
+            <FileOutlined />
+            <span>文件列表</span>
+          </Space>
         }
-      />
-      {fileListView(fileConfig.files)}
+      >
+        {renderFileList(fileConfig.files)}
+      </Card>
     </div>
   );
 };

@@ -249,6 +249,7 @@ const GeneratorAdminPage: React.FC = () => {
         headerTitle={'查询表格'}
         actionRef={actionRef}
         rowKey="key"
+        scroll={{ x: 'max-content' }}
         search={{
           labelWidth: 120,
         }}

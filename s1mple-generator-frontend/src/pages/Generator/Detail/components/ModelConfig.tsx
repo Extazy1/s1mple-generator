@@ -1,6 +1,6 @@
-import { FileOutlined } from '@ant-design/icons';
-import { Descriptions, DescriptionsProps, Divider } from 'antd';
 import React from 'react';
+import { Descriptions, Card, Collapse, Space, Tag } from 'antd';
+import { FileOutlined } from '@ant-design/icons';
 
 interface Props {
   data: API.GeneratorVO;
@@ -12,109 +12,83 @@ interface Props {
  */
 const ModelConfig: React.FC<Props> = (props) => {
   const { data } = props;
-
   const modelConfig = data?.modelConfig;
+
   if (!modelConfig) {
-    return <></>;
+    return null;
   }
 
-  const modelListView = (models?: API.ModelInfo[]) => {
-    if (!models) {
-      return <></>;
+  const renderModelList = (models?: API.ModelInfo[]) => {
+    if (!models || models.length === 0) {
+      return <p style={{ color: '#999' }}>暂无模型配置</p>;
     }
 
     return (
-      <>
+      <Collapse
+        bordered={false}
+        style={{ backgroundColor: '#fff' }}
+        accordion
+      >
         {models.map((model, index) => {
-          // 是分组
+          // 如果是分组
           if (model.groupKey) {
-            const groupModelItems: DescriptionsProps['items'] = [
-              {
-                key: 'groupKey',
-                label: '分组key',
-                children: <p>{model.groupKey}</p>,
-              },
-              {
-                key: 'groupName',
-                label: '分组名',
-                children: <p>{model.groupName}</p>,
-              },
-              {
-                key: 'condition',
-                label: '条件',
-                children: <p>{model.condition}</p>,
-              },
-              {
-                key: 'models',
-                label: '组内模型',
-                children: <p>{modelListView(model.models)}</p>,
-              },
-            ];
-
             return (
-              <Descriptions
+              <Collapse.Panel
                 key={index}
-                column={1}
-                title={model.groupName}
-                items={groupModelItems}
-              />
+                header={
+                  <Space>
+                    <Tag color="purple">{model.groupKey}</Tag>
+                    {model.groupName}
+                  </Space>
+                }
+              >
+                <Descriptions column={1} size="small" bordered>
+                  <Descriptions.Item label="分组 key">{model.groupKey}</Descriptions.Item>
+                  <Descriptions.Item label="分组名">{model.groupName}</Descriptions.Item>
+                  <Descriptions.Item label="条件">{model.condition}</Descriptions.Item>
+                  <Descriptions.Item label="组内模型">
+                    {renderModelList(model.models)}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Collapse.Panel>
             );
           }
 
-          const modelItems: DescriptionsProps['items'] = [
-            {
-              key: 'fieldName',
-              label: '字段名称',
-              children: <p>{model.fieldName}</p>,
-            },
-            {
-              key: 'type',
-              label: '类型',
-              children: <p>{model.type}</p>,
-            },
-            {
-              key: 'description',
-              label: '描述',
-              children: <p>{model.description}</p>,
-            },
-            {
-              key: 'defaultValue',
-              label: '默认值',
-              children: <p>{model.defaultValue as any}</p>,
-            },
-            {
-              key: 'abbr',
-              label: '缩写',
-              children: <p>{model.abbr}</p>,
-            },
-            {
-              key: 'condition',
-              label: '条件',
-              children: <p>{model.condition}</p>,
-            },
-          ];
-
+          // 如果是单个模型
           return (
-            <>
-              <Descriptions column={2} key={index} items={modelItems} />
-              <Divider />
-            </>
+            <Collapse.Panel
+              key={index}
+              header={model.fieldName || '未命名模型字段'}
+            >
+              <Descriptions column={1} size="small" bordered>
+                <Descriptions.Item label="字段名称">{model.fieldName}</Descriptions.Item>
+                <Descriptions.Item label="类型">{model.type}</Descriptions.Item>
+                <Descriptions.Item label="描述">{model.description}</Descriptions.Item>
+                <Descriptions.Item label="默认值">
+                  {model.defaultValue as any}
+                </Descriptions.Item>
+                <Descriptions.Item label="缩写">{model.abbr}</Descriptions.Item>
+                <Descriptions.Item label="条件">{model.condition}</Descriptions.Item>
+              </Descriptions>
+            </Collapse.Panel>
           );
         })}
-      </>
+      </Collapse>
     );
   };
 
   return (
     <div>
-      <Descriptions
+      <Card
         title={
-          <>
-            <FileOutlined /> 模型列表
-          </>
+          <Space>
+            <FileOutlined />
+            <span>模型列表</span>
+          </Space>
         }
-      />
-      {modelListView(modelConfig.models)}
+      >
+        {renderModelList(modelConfig.models)}
+      </Card>
     </div>
   );
 };
