@@ -6,6 +6,7 @@ import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown } from './components/RightContent/AvatarDropdown';
 import { requestConfig } from './requestConfig';
+import { ConfigProvider, theme } from 'antd';
 
 const loginPath = '/user/login';
 
@@ -40,6 +41,19 @@ export async function getInitialState(): Promise<InitialState> {
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+  const customTheme = {
+    token: {
+      colorPrimary: '#1890ff', /* 主色调 */
+      colorInfo: '#1890ff',
+      colorSuccess: '#52c41a',
+      colorWarning: '#faad14',
+      colorError: '#f5222d',
+      fontSize: 16,
+      borderRadius: 8, /* 全局圆角 */
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* 柔和阴影 */
+    },
+  };
+
   return {
     logo,
     avatarProps: {
@@ -47,15 +61,22 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         return <AvatarDropdown />;
       },
     },
+    footerRender: () => <Footer />,
+    menuHeaderRender: undefined,
+    ...defaultSettings,
     //开关水印
     // waterMarkProps: {
     //   content: initialState?.currentUser?.userName,
     // },
-    footerRender: () => <Footer />,
-    menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
-    ...defaultSettings,
+    childrenRender: (children) => {
+      return (
+        <ConfigProvider theme={customTheme}>
+            {children}
+        </ConfigProvider>
+      );
+    },
   };
 };
 

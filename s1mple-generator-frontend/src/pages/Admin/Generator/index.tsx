@@ -3,7 +3,7 @@ import UpdateModal from '@/pages/Admin/Generator/components/UpdateModal';
 import {deleteGeneratorUsingPost, listGeneratorByPageUsingPost,} from '@/services/backend/generatorController';
 import {PlusOutlined} from '@ant-design/icons';
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
-import {ProTable} from '@ant-design/pro-components';
+import {PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
 import {Button, message, Select, Space, Tag, Tooltip, Typography} from 'antd';
 import React, {useRef, useState} from 'react';
@@ -241,7 +241,16 @@ const GeneratorAdminPage: React.FC = () => {
   ];
 
   return (
-    <div className="generator-admin-page">
+    <PageContainer
+      title={false}
+      header={{
+        breadcrumb: {},
+      }}
+      style={{
+        maxWidth: 2400, // 设置最大宽度
+        margin: '0 auto', // 居中对齐
+      }}
+    >
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
         生成器管理
       </Typography.Title>
@@ -307,7 +316,7 @@ const GeneratorAdminPage: React.FC = () => {
           setUpdateModalVisible(false);
         }}
       />
-    </div>
+    </PageContainer>
   );
 };
 export default GeneratorAdminPage;

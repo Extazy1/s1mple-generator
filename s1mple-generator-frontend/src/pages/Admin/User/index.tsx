@@ -132,7 +132,12 @@ const UserAdminPage: React.FC = () => {
     },
   ];
   return (
-    <div className="user-admin-page">
+    <PageContainer
+      title={false}
+      header={{
+        breadcrumb: {},
+      }}
+    >
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
         用户管理
       </Typography.Title>
@@ -197,7 +202,7 @@ const UserAdminPage: React.FC = () => {
           setUpdateModalVisible(false);
         }}
       />
-    </div>
+    </PageContainer>
   );
 };
 export default UserAdminPage;

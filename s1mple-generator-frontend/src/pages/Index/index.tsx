@@ -98,8 +98,8 @@ const IndexPage: React.FC = () => {
         style={{
           textAlign: 'center',
           padding: '32px 0 16px 0',
-          backgroundColor: 'transparent', // 设置背景透明
-          borderRadius: 0, // 移除圆角
+          background: 'linear-gradient(to right, #f8f9fa, #e9ecef)',
+          borderRadius: 12,
           marginBottom: 24,
         }}
       >
@@ -112,32 +112,32 @@ const IndexPage: React.FC = () => {
         <Typography.Text type="secondary">
           快速查找并使用你需要的代码生成器，提高工作效率
         </Typography.Text>
-      </div>
 
-      {/* 搜索框居中 */}
-      <Flex justify="center" style={{ marginBottom: 24 }}>
-        <Input.Search
-          style={{
-            width: '40vw',
-            minWidth: 320,
-            borderRadius: 8,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          }}
-          placeholder="搜索代码生成器"
-          allowClear
-          enterButton="搜索"
-          size="large"
-          onChange={(e) => {
-            searchParams.searchText = e.target.value;
-          }}
-          onSearch={(value: string) => {
-            setSearchParams({
-              ...DEFAULT_PAGE_PARAMS,
-              searchText: value,
-            });
-          }}
-        />
-      </Flex>
+        {/* 搜索框居中 */}
+        <Flex justify="center" style={{ marginBottom: 24 }}>
+          <Input.Search
+            style={{
+              width: '40vw',
+              minWidth: 320,
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}
+            placeholder="搜索代码生成器"
+            allowClear
+            enterButton="搜索"
+            size="large"
+            onChange={(e) => {
+              searchParams.searchText = e.target.value;
+            }}
+            onSearch={(value: string) => {
+              setSearchParams({
+                ...DEFAULT_PAGE_PARAMS,
+                searchText: value,
+              });
+            }}
+          />
+        </Flex>
+      </div>
 
       {/* 分类 Tab */}
       <Tabs
