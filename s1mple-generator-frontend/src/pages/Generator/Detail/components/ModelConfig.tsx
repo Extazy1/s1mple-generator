@@ -1,6 +1,6 @@
-import React from 'react';
-import { Descriptions, Card, Collapse, Space, Tag } from 'antd';
 import { FileOutlined } from '@ant-design/icons';
+import { Card, Collapse, Descriptions, Space, Tag } from 'antd';
+import React from 'react';
 
 interface Props {
   data: API.GeneratorVO;
@@ -24,11 +24,7 @@ const ModelConfig: React.FC<Props> = (props) => {
     }
 
     return (
-      <Collapse
-        bordered={false}
-        style={{ backgroundColor: '#fff' }}
-        accordion
-      >
+      <Collapse bordered={false} style={{ backgroundColor: '#fff' }} accordion>
         {models.map((model, index) => {
           // 如果是分组
           if (model.groupKey) {
@@ -56,17 +52,12 @@ const ModelConfig: React.FC<Props> = (props) => {
 
           // 如果是单个模型
           return (
-            <Collapse.Panel
-              key={index}
-              header={model.fieldName || '未命名模型字段'}
-            >
+            <Collapse.Panel key={index} header={model.fieldName || '未命名模型字段'}>
               <Descriptions column={1} size="small" bordered>
                 <Descriptions.Item label="字段名称">{model.fieldName}</Descriptions.Item>
                 <Descriptions.Item label="类型">{model.type}</Descriptions.Item>
                 <Descriptions.Item label="描述">{model.description}</Descriptions.Item>
-                <Descriptions.Item label="默认值">
-                  {model.defaultValue as any}
-                </Descriptions.Item>
+                <Descriptions.Item label="默认值">{model.defaultValue as any}</Descriptions.Item>
                 <Descriptions.Item label="缩写">{model.abbr}</Descriptions.Item>
                 <Descriptions.Item label="条件">{model.condition}</Descriptions.Item>
               </Descriptions>

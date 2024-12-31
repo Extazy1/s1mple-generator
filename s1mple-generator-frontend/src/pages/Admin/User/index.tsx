@@ -1,3 +1,4 @@
+import ContextMenu from '@/components/ContentTool/ContextMenu';
 import CreateModal from '@/pages/Admin/User/components/CreateModal';
 import UpdateModal from '@/pages/Admin/User/components/UpdateModal';
 import {deleteUserUsingPost, listUserByPageUsingPost} from '@/services/backend/userController';
@@ -6,7 +7,7 @@ import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
 import {Button, message, Space, Typography} from 'antd';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 /**
  * 用户管理页面
@@ -18,9 +19,19 @@ const UserAdminPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const actionRef = useRef<ActionType>();
-  // 当前用户点击的数据
+  // 当前用户点击的数据（双击或右键）
   const [currentRow, setCurrentRow] = useState<API.User>();
+
+  // 右键菜单相关状态
+  const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
+  const [contextMenuRow, setContextMenuRow] = useState<API.User>();
+
+  // ProTable 的操作引用,用于在修改表格后进行刷新
+  const actionRef = useRef<ActionType>();
 
   /**
    * 删除节点
@@ -43,6 +54,47 @@ const UserAdminPage: React.FC = () => {
       message.error('删除失败，' + error.message);
       return false;
     }
+  };
+
+  // 点击其他区域隐藏右键菜单
+  useEffect(() => {
+    // 关闭菜单的事件处理
+    const handleClick = () => {
+      if (contextMenuVisible) {
+        setContextMenuVisible(false);
+      }
+    };
+
+    // 监听滚动事件关闭菜单
+    const handleScroll = () => {
+      if (contextMenuVisible) {
+        setContextMenuVisible(false);
+      }
+    };
+
+    window.addEventListener('click', handleClick); // 点击其他区域关闭菜单
+    window.addEventListener('scroll', handleScroll); // 滚动时关闭菜单
+
+    return () => {
+      // 移除事件监听器
+      window.removeEventListener('click', handleClick);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [contextMenuVisible]);
+
+  const handleUpdate = () => {
+    if (contextMenuRow) {
+      setCurrentRow(contextMenuRow);
+    }
+    setUpdateModalVisible(true);
+    setContextMenuVisible(false);
+  };
+
+  const handleDeleteFromContextMenu = () => {
+    if (contextMenuRow) {
+      handleDelete(contextMenuRow);
+    }
+    setContextMenuVisible(false);
   };
 
   /**
@@ -142,12 +194,13 @@ const UserAdminPage: React.FC = () => {
         用户管理
       </Typography.Title>
       <ProTable<API.User>
-        headerTitle={'查询表格'}
+        headerTitle={false}
         actionRef={actionRef}
         rowKey="key"
         search={{
           labelWidth: 120,
         }}
+        scroll={{ x: 'max-content' }}
         toolBarRender={() => [
           <Button
             type="primary"
@@ -177,7 +230,33 @@ const UserAdminPage: React.FC = () => {
           };
         }}
         columns={columns}
+        onRow={(record) => {
+          return {
+            // 双击行时，进入修改页面
+            onDoubleClick: () => {
+              setCurrentRow(record);
+              setUpdateModalVisible(true);
+            },
+            // 右键菜单逻辑
+            onContextMenu: (event) => {
+              event.preventDefault();
+              setContextMenuRow(record);
+              setContextMenuPosition({ x: event.pageX, y: event.pageY });
+              setContextMenuVisible(true);
+            },
+          };
+        }}
       />
+
+      {/* 右键菜单 - 仅在contextMenuVisible为true时显示 */}
+      <ContextMenu
+        visible={contextMenuVisible}
+        position={contextMenuPosition}
+        onUpdate={handleUpdate}
+        onDelete={handleDeleteFromContextMenu}
+        onClose={() => setContextMenuVisible(false)}
+      />
+
       <CreateModal
         visible={createModalVisible}
         columns={columns}

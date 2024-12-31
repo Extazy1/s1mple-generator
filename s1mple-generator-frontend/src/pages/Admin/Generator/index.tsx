@@ -1,14 +1,14 @@
+import ContextMenu from '@/components/ContentTool/ContextMenu';
+import JsonPreview from '@/components/ContentTool/JsonPreview';
 import CreateModal from '@/pages/Admin/Generator/components/CreateModal';
 import UpdateModal from '@/pages/Admin/Generator/components/UpdateModal';
 import {deleteGeneratorUsingPost, listGeneratorByPageUsingPost,} from '@/services/backend/generatorController';
-import {PlusOutlined} from '@ant-design/icons';
+import {FolderOutlined, PlusOutlined} from '@ant-design/icons';
 import type {ActionType, ProColumns} from '@ant-design/pro-components';
 import {PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
 import {Button, message, Select, Space, Tag, Tooltip, Typography} from 'antd';
-import React, {useRef, useState} from 'react';
-import { FolderOutlined } from '@ant-design/icons';
-import JsonPreview from '@/components/JsonPreview';
+import React, {useEffect, useRef, useState} from 'react';
 
 /**
  * 生成器管理页面
@@ -20,10 +20,18 @@ const GeneratorAdminPage: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  //获取表格实例，用于在修改表格后进行刷新
-  const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.Generator>();
+  // 右键菜单相关状态
+  const [contextMenuVisible, setContextMenuVisible] = useState<boolean>(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
+  const [contextMenuRow, setContextMenuRow] = useState<API.User>();
+
+  // ProTable 的操作引用,用于在修改表格后进行刷新
+  const actionRef = useRef<ActionType>();
 
   /**
    * 删除节点
@@ -154,7 +162,13 @@ const GeneratorAdminPage: React.FC = () => {
         return (
           <Tooltip title={distPath}>
             <Typography.Link
-              style={{ maxWidth: 150, display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              style={{
+                maxWidth: 150,
+                display: 'inline-block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
               href={distPath.startsWith('http') ? distPath : undefined}
               target="_blank"
             >
@@ -240,6 +254,47 @@ const GeneratorAdminPage: React.FC = () => {
     },
   ];
 
+  // 点击其他区域隐藏右键菜单
+  useEffect(() => {
+    // 关闭菜单的事件处理
+    const handleClick = () => {
+      if (contextMenuVisible) {
+        setContextMenuVisible(false);
+      }
+    };
+
+    // 监听滚动事件关闭菜单
+    const handleScroll = () => {
+      if (contextMenuVisible) {
+        setContextMenuVisible(false);
+      }
+    };
+
+    window.addEventListener('click', handleClick); // 点击其他区域关闭菜单
+    window.addEventListener('scroll', handleScroll); // 滚动时关闭菜单
+
+    return () => {
+      // 移除事件监听器
+      window.removeEventListener('click', handleClick);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [contextMenuVisible]);
+
+  const handleUpdate = () => {
+    if (contextMenuRow) {
+      setCurrentRow(contextMenuRow);
+    }
+    setUpdateModalVisible(true);
+    setContextMenuVisible(false);
+  };
+
+  const handleDeleteFromContextMenu = () => {
+    if (contextMenuRow) {
+      handleDelete(contextMenuRow);
+    }
+    setContextMenuVisible(false);
+  };
+
   return (
     <PageContainer
       title={false}
@@ -255,7 +310,7 @@ const GeneratorAdminPage: React.FC = () => {
         生成器管理
       </Typography.Title>
       <ProTable<API.Generator>
-        headerTitle={'查询表格'}
+        headerTitle={false}
         actionRef={actionRef}
         rowKey="key"
         scroll={{ x: 'max-content' }}
@@ -291,7 +346,39 @@ const GeneratorAdminPage: React.FC = () => {
           };
         }}
         columns={columns}
+        onRow={(record) => {
+          return {
+            // 双击行时，进入修改页面，同时隐藏右键菜单
+            onDoubleClick: (event) => {
+              event.stopPropagation(); // 阻止事件传播
+              setContextMenuVisible(false); // 确保右键菜单隐藏
+              setCurrentRow(record);
+              setUpdateModalVisible(true);
+            },
+            // 右键菜单逻辑
+            onContextMenu: (event) => {
+              event.preventDefault(); // 阻止浏览器默认右键行为
+              if (event.detail === 2) {
+                // 如果是双击，不执行右键逻辑
+                return;
+              }
+              setContextMenuRow(record);
+              setContextMenuPosition({ x: event.pageX, y: event.pageY });
+              setContextMenuVisible(true);
+            },
+          };
+        }}
       />
+
+      {/* 右键菜单 - 仅在contextMenuVisible为true时显示 */}
+      <ContextMenu
+        visible={contextMenuVisible}
+        position={contextMenuPosition}
+        onUpdate={handleUpdate}
+        onDelete={handleDeleteFromContextMenu}
+        onClose={() => setContextMenuVisible(false)}
+      />
+
       <CreateModal
         visible={createModalVisible}
         columns={columns}

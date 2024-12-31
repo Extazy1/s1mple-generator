@@ -1,10 +1,10 @@
+import { Modal } from 'antd';
 import React, { useState } from 'react';
-import { Button, Modal } from 'antd';
 
 interface JsonPreviewProps {
   jsonString?: string;
-  maxLength?: number;     // 表格中预览时显示的最大字符数
-  title?: string;         // Modal 标题
+  maxLength?: number; // 表格中预览时显示的最大字符数
+  title?: string; // Modal 标题
 }
 
 /**
@@ -24,9 +24,8 @@ const JsonPreview: React.FC<JsonPreviewProps> = (props) => {
   }
 
   // 截断以在表格中显示片段
-  const shortText = jsonString.length > maxLength
-    ? `${jsonString.substring(0, maxLength)} ...`
-    : jsonString;
+  const shortText =
+    jsonString.length > maxLength ? `${jsonString.substring(0, maxLength)} ...` : jsonString;
 
   return (
     <>
@@ -56,10 +55,7 @@ const JsonPreview: React.FC<JsonPreviewProps> = (props) => {
       >
         <div style={{ backgroundColor: '#fafafa', padding: 12, borderRadius: 4 }}>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-            {parsed
-              ? JSON.stringify(parsed, null, 2)
-              : jsonString
-            }
+            {parsed ? JSON.stringify(parsed, null, 2) : jsonString}
           </pre>
         </div>
       </Modal>

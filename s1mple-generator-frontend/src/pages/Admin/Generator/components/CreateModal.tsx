@@ -16,6 +16,8 @@ interface Props {
  * @param fields
  */
 const handleAdd = async (fields: API.GeneratorAddRequest) => {
+  fields.fileConfig = JSON.parse((fields.fileConfig || '{}') as string);
+  fields.modelConfig = JSON.parse((fields.modelConfig || '{}') as string);
   const hide = message.loading('正在添加');
   try {
     await addGeneratorUsingPost(fields);

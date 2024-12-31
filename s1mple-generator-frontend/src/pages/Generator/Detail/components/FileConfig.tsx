@@ -1,6 +1,6 @@
-import React from 'react';
-import { Descriptions, DescriptionsProps, Card, Collapse, Space, Tag } from 'antd';
 import { FileOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Collapse, Descriptions, DescriptionsProps, Space, Tag } from 'antd';
+import React from 'react';
 
 interface Props {
   data: API.GeneratorVO;
@@ -27,11 +27,7 @@ const FileConfig: React.FC<Props> = (props) => {
     }
 
     return (
-      <Collapse
-        bordered={false}
-        style={{ backgroundColor: '#fff' }}
-        accordion
-      >
+      <Collapse bordered={false} style={{ backgroundColor: '#fff' }} accordion>
         {files.map((file, index) => {
           // 如果是分组
           if (file.groupKey) {
@@ -72,9 +68,7 @@ const FileConfig: React.FC<Props> = (props) => {
                 <Descriptions.Item label="输入路径">{file.inputPath}</Descriptions.Item>
                 <Descriptions.Item label="输出路径">{file.outputPath}</Descriptions.Item>
                 <Descriptions.Item label="文件类别">{file.type}</Descriptions.Item>
-                <Descriptions.Item label="文件生成类别">
-                  {file.generateType}
-                </Descriptions.Item>
+                <Descriptions.Item label="文件生成类别">{file.generateType}</Descriptions.Item>
                 <Descriptions.Item label="条件">{file.condition}</Descriptions.Item>
               </Descriptions>
             </Collapse.Panel>
@@ -118,12 +112,7 @@ const FileConfig: React.FC<Props> = (props) => {
         }
         style={{ marginBottom: 24 }}
       >
-        <Descriptions
-          bordered
-          size="small"
-          column={1}
-          items={basicInfoItems}
-        />
+        <Descriptions bordered size="small" column={1} items={basicInfoItems} />
       </Card>
 
       <Card

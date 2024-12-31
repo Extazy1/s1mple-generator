@@ -5,9 +5,9 @@ import FileConfigForm from '@/pages/Generator/Add/components/FileConfigForm';
 import GeneratorMaker from '@/pages/Generator/Add/components/GeneratorMaker';
 import ModelConfigForm from '@/pages/Generator/Add/components/ModelConfigForm';
 import {
-  addGeneratorUsingPost,
-  editGeneratorUsingPost,
-  getGeneratorVoByIdUsingGet,
+    addGeneratorUsingPost,
+    editGeneratorUsingPost,
+    getGeneratorVoByIdUsingGet,
 } from '@/services/backend/generatorController';
 import {useSearchParams} from '@@/exports';
 import type {ProFormInstance} from '@ant-design/pro-components';

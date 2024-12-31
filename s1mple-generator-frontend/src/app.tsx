@@ -3,10 +3,10 @@ import Footer from '@/components/Footer';
 import { getLoginUserUsingGet } from '@/services/backend/userController';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
+import { ConfigProvider } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown } from './components/RightContent/AvatarDropdown';
 import { requestConfig } from './requestConfig';
-import { ConfigProvider, theme } from 'antd';
 
 const loginPath = '/user/login';
 
@@ -43,14 +43,14 @@ export async function getInitialState(): Promise<InitialState> {
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   const customTheme = {
     token: {
-      colorPrimary: '#1890ff', /* 主色调 */
+      colorPrimary: '#1890ff' /* 主色调 */,
       colorInfo: '#1890ff',
       colorSuccess: '#52c41a',
       colorWarning: '#faad14',
       colorError: '#f5222d',
       fontSize: 16,
-      borderRadius: 8, /* 全局圆角 */
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* 柔和阴影 */
+      borderRadius: 8 /* 全局圆角 */,
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' /* 柔和阴影 */,
     },
   };
 
@@ -71,11 +71,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     childrenRender: (children) => {
-      return (
-        <ConfigProvider theme={customTheme}>
-            {children}
-        </ConfigProvider>
-      );
+      return <ConfigProvider theme={customTheme}>{children}</ConfigProvider>;
     },
   };
 };

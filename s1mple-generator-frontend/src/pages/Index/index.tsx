@@ -1,27 +1,10 @@
-import { listGeneratorVoByPageFastUsingPost } from '@/services/backend/generatorController';
-import { UserOutlined } from '@ant-design/icons';
-import {
-  PageContainer,
-  ProFormSelect,
-  ProFormText,
-  QueryFilter,
-} from '@ant-design/pro-components';
-import { Link } from '@umijs/max';
-import {
-  Avatar,
-  Card,
-  Flex,
-  Image,
-  Input,
-  List,
-  message,
-  Tabs,
-  Tag,
-  Typography,
-  theme,
-} from 'antd';
+import {listGeneratorVoByPageFastUsingPost} from '@/services/backend/generatorController';
+import {UserOutlined} from '@ant-design/icons';
+import {PageContainer, ProFormSelect, ProFormText, QueryFilter} from '@ant-design/pro-components';
+import {Link} from '@umijs/max';
+import {Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, theme, Typography,} from 'antd';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 /**
  * 默认分页参数
@@ -103,10 +86,7 @@ const IndexPage: React.FC = () => {
           marginBottom: 24,
         }}
       >
-        <Typography.Title
-          level={2}
-          style={{ marginBottom: 8, color: token.colorTextBase }}
-        >
+        <Typography.Title level={2} style={{ marginBottom: 8, color: token.colorTextBase }}>
           欢迎来到代码生成器库
         </Typography.Title>
         <Typography.Text type="secondary">
