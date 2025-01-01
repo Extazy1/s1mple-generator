@@ -70,8 +70,7 @@ public class GeneratorController {
     @Resource
     private CacheManager cacheManager;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private static final String GENERATOR_LIST_VERSION_KEY = "generator:list:version";
 
     // region 增删改查
 
@@ -103,6 +102,9 @@ public class GeneratorController {
         generator.setStatus(0);
         boolean result = generatorService.save(generator);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+
+        updateGeneratorListCacheVersion();
+
         long newGeneratorId = generator.getId();
         return ResultUtils.success(newGeneratorId);
     }
@@ -128,6 +130,9 @@ public class GeneratorController {
         if (!oldGenerator.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+
+        updateGeneratorListCacheVersion();
+
         boolean b = generatorService.removeById(id);
         return ResultUtils.success(b);
     }
@@ -159,6 +164,9 @@ public class GeneratorController {
         // 判断是否存在
         Generator oldGenerator = generatorService.getById(id);
         ThrowUtils.throwIf(oldGenerator == null, ErrorCode.NOT_FOUND_ERROR);
+
+        updateGeneratorListCacheVersion();
+
         boolean result = generatorService.updateById(generator);
         return ResultUtils.success(result);
     }
@@ -254,6 +262,18 @@ public class GeneratorController {
         cacheManager.put(cacheKey, generatorVOPage);
         return ResultUtils.success(generatorVOPage);
     }
+
+    private void updateGeneratorListCacheVersion() {
+        // 这里简单调用 cacheManager.put()，令其自增 version
+        // 不过因为它本身是一个普通 key，你需要先从 cacheManager 拿到旧值 + 1
+        Long oldVersion = (Long) cacheManager.get(GENERATOR_LIST_VERSION_KEY);
+        if (oldVersion == null) {
+            oldVersion = 0L;
+        }
+        Long newVersion = oldVersion + 1;
+        cacheManager.put(GENERATOR_LIST_VERSION_KEY, newVersion);
+    }
+
     /**
      * 分页获取当前用户创建的资源列表
      *
