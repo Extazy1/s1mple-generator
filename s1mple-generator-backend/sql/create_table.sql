@@ -76,7 +76,7 @@ VALUES (18, 'acm-template-pro-generator', 'ACM 示例模板生成器', 'com.exta
         "groupKey": "git",
         "groupName": "开源",
         "type": "group",
-        "condition": "needGit",
+        "condition": "switchGit",
         "files": [
           {
             "inputPath": ".gitignore",
@@ -100,7 +100,7 @@ VALUES (18, 'acm-template-pro-generator', 'ACM 示例模板生成器', 'com.exta
       }
     ]
   }',
-        '{"models":[{"fieldName":"needGit","type":"boolean","description":"是否生成 .gitignore 文件","defaultValue":true},{"fieldName":"loop","type":"boolean","description":"是否生成循环","defaultValue":false,"abbr":"l"},{"type":"MainTemplate","description":"用于生成核心模板文件","groupKey":"mainTemplate","groupName":"核心模板","models":[{"fieldName":"author","type":"String","description":"作者注释","defaultValue":"extazy","abbr":"a"},{"fieldName":"outputText","type":"String","description":"输出信息","defaultValue":"sum = ","abbr":"o"}],"condition":"loop"}]}',
+        '{"models":[{"fieldName":"switchGit","type":"boolean","description":"是否生成 .gitignore 文件","defaultValue":true},{"fieldName":"loop","type":"boolean","description":"是否生成循环","defaultValue":false,"abbr":"l"},{"type":"MainTemplate","description":"用于生成核心模板文件","groupKey":"mainTemplate","groupName":"核心模板","models":[{"fieldName":"author","type":"String","description":"作者注释","defaultValue":"extazy","abbr":"a"},{"fieldName":"outputText","type":"String","description":"输出信息","defaultValue":"sum = ","abbr":"o"}],"condition":"loop"}]}',
         '/generator_dist/1844653482369851394/acm-template-pro-generator-dist.zip', 0, 1840316301899640832,
         '2024-10-18 10:00:17', '2024-10-18 18:50:12', 0);
 

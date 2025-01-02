@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import {request} from '@umijs/max';
+import { request } from '@umijs/max';
 
 /** addGenerator POST /api/generator/add */
 export async function addGeneratorUsingPost(
@@ -158,6 +158,21 @@ export async function listMyGeneratorVoByPageUsingPost(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageGeneratorVO_>('/api/generator/my/list/page/vo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** parseTemplate POST /api/generator/parseTemplate */
+export async function parseTemplateUsingPost(
+  body: API.GeneratorParseTemplateRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseGenerator_>('/api/generator/parseTemplate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

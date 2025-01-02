@@ -5,6 +5,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseGenerator_ = {
+    code?: number;
+    data?: Generator;
+    message?: string;
+  };
+
   type BaseResponseGeneratorVO_ = {
     code?: number;
     data?: GeneratorVO;
@@ -148,6 +154,10 @@ declare namespace API {
   type GeneratorMakeRequest = {
     meta?: Meta;
     zipFilePath?: string;
+  };
+
+  type GeneratorParseTemplateRequest = {
+    fileUrl?: string;
   };
 
   type GeneratorQueryRequest = {

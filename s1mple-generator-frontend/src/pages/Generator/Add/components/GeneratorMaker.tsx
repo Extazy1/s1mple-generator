@@ -14,6 +14,20 @@ export default (props: Props) => {
   const { meta } = props;
   const formRef = useRef<ProFormInstance>();
 
+  //  meta.templateUrl 是前一步表单存的
+  // 构造一个可被 antd <Upload> 识别的已上传文件
+  const defaultFileList = meta.templateUrl
+    ? [
+      {
+        uid: 'uploaded',
+        name: meta.templateUrl.split('/').pop() || '已上传文件.zip',
+        status: 'done' as const,
+        url: meta.templateUrl,      // 用于预览
+        response: meta.templateUrl, // 用于后续 onFinish 取
+      },
+    ]
+    : [];
+
   /**
    * 提交
    * @param values
@@ -59,6 +73,10 @@ export default (props: Props) => {
   const formView = (
     <ProForm
       formRef={formRef}
+      initialValues={{
+        // 让 antd Upload 显示已上传文件
+        zipFilePath: defaultFileList,
+      }}
       submitter={{
         searchConfig: {
           submitText: '制作',

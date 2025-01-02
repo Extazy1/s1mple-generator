@@ -650,4 +650,99 @@ public class GeneratorController {
         return key;
     }
 
+    /**
+     * 解析用户上传的模板包，生成文件配置并返回
+     */
+    /**
+     * 接收 fileUrl，解析模板压缩包中的所有文件 / 文件夹信息，存入 Meta.FileConfig.files，然后塞到 Generator.fileConfig 里返回
+     */
+    @PostMapping("/parseTemplate")
+    public BaseResponse<Generator> parseTemplate(@RequestBody GeneratorParseTemplateRequest generatorParseTemplateRequest, HttpServletRequest request, HttpServletResponse response) {
+        // 1) 参数校验
+        String fileUrl = generatorParseTemplateRequest.getFileUrl();
+        if (request == null || StrUtil.isBlank(fileUrl)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "fileUrl 不能为空");
+        }
+
+        // 需要登录
+        User loginUser = userService.getLoginUser(request);
+
+        // 2) 下载 zip 到本地
+        if (StrUtil.isBlank(fileUrl)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "文件不存在");
+        }
+
+        String projectPath = System.getProperty("user.dir");
+        String uniqueId = IdUtil.getSnowflakeNextIdStr() + RandomUtil.randomString(6);
+        String tempDirPath = StrUtil.format("{}/.temp/parse/{}", projectPath, uniqueId);
+        String localZipFilePath = tempDirPath + "/project.zip";
+
+        FileUtil.mkdir(tempDirPath);
+        FileUtil.touch(localZipFilePath);
+
+        try {
+            cosManager.download(fileUrl, localZipFilePath);
+        } catch (Exception e) {
+            log.error("下载模板失败, fileUrl = {}", fileUrl, e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载模板失败");
+        }
+
+        // 3) 解压
+        File unzipDistDir = ZipUtil.unzip(localZipFilePath);
+
+        // 4) 遍历解压后的文件 / 文件夹，填充 FileInfo 列表
+        List<Meta.FileConfig.FileInfo> fileInfoList = FileUtil.loopFiles(unzipDistDir).stream().map(file -> {
+            // 计算相对路径
+            String relativePath = FileUtil.subPath(unzipDistDir.getAbsolutePath(), file).replace("\\", "/");
+
+            Meta.FileConfig.FileInfo info = new Meta.FileConfig.FileInfo();
+            info.setInputPath(relativePath);
+
+            // 如果文件是以 .ftl 结尾，则去掉 .ftl 设置为 outputPath
+            if (relativePath.endsWith(".ftl")) {
+                info.setOutputPath(relativePath.substring(0, relativePath.length() - 4)); // 去掉 .ftl
+                info.setGenerateType("dynamic");
+            } else {
+                info.setOutputPath(relativePath); // 保持原路径
+                info.setGenerateType("static");
+            }
+
+            info.setType(file.isDirectory() ? "dir" : "file");
+            return info;
+        }).toList();
+
+        // 5) 构造一个 Meta，并往 fileConfig 里塞进 fileInfoList
+        Meta meta = new Meta();
+        // 你可以在这里给 meta.name / meta.description 等字段赋值
+        Meta.FileConfig fileConfig = new Meta.FileConfig();
+        // 这几个路径属性按需填
+        fileConfig.setInputRootPath(unzipDistDir.getAbsolutePath());
+        fileConfig.setOutputRootPath(unzipDistDir.getAbsolutePath());
+        fileConfig.setSourceRootPath(unzipDistDir.getAbsolutePath());
+        // ...
+        fileConfig.setFiles(fileInfoList);
+
+        // 赋值给 meta
+        meta.setFileConfig(fileConfig);
+
+        // 6) 组装一个 Generator，把 meta.fileConfig 序列化后赋值给 generator.fileConfig
+        Generator generator = new Generator();
+        // generator.setName("parsed-template");  // 看需求
+        // 直接把 `meta.fileConfig` 写入 generator.fileConfig (JSON)
+        generator.setFileConfig(JSONUtil.toJsonStr(meta.getFileConfig()));
+
+        // 如果想写更多字段，也可以
+        // generator.setDescription("根据模板自动解析的文件配置");
+        // generator.setAuthor("system");
+        // generator.setStatus(0);
+
+        // 7) 异步清理临时目录
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
+
+        // 8) 返回
+        return ResultUtils.success(generator);
+    }
+
 }
