@@ -171,11 +171,14 @@ const IndexPage: React.FC = () => {
           label="标签"
           name="tags"
           mode="tags"
+          style={{
+            width: 200, // 限制显示区域宽度
+          }}
           options={[
-            { label: 'JavaScript', value: 'JavaScript' },
+            { label: '前端', value: '前端' },
+            { label: '后端', value: '后端' },
             { label: 'React', value: 'React' },
-            { label: 'Node.js', value: 'Node.js' },
-            { label: 'TypeScript', value: 'TypeScript' },
+            { label: 'Vue', value: 'Vue' },
             { label: 'Java', value: 'Java' },
           ]}
         />

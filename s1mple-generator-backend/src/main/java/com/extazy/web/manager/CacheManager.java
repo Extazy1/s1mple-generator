@@ -20,140 +20,110 @@ public class CacheManager {
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * 本地缓存（仅存 {key, CacheValue}，其中 CacheValue 里含有具体数据和 version）
+     * 本地缓存（<String, CacheValue>）
      */
     private final Cache<String, CacheValue> localCache = Caffeine.newBuilder()
             .expireAfterWrite(100, TimeUnit.MINUTES)
             .maximumSize(10_000)
             .build();
 
-    /**
-     * 缓存版本号在 Redis 中的前缀
-     */
     private static final String REDIS_VERSION_PREFIX = "cache:version:";
-
-    /**
-     * 缓存数据在 Redis 中的前缀
-     */
     private static final String REDIS_DATA_PREFIX = "cache:data:";
-
-    /**
-     * 过期时间
-     */
     private static final long CACHE_EXPIRE_MINUTES = 100L;
 
     /**
      * 写入缓存
-     * 1. 递增并获取最新版本号
-     * 2. 根据版本号写入 Redis
-     * 3. 写入本地缓存
-     *
-     * @param key   业务键
-     * @param value 要缓存的值
      */
     public void put(String key, Object value) {
         if (key == null) {
             return;
         }
-        // 1) 递增 Redis 中的版本号
-        Long newVersion = redisTemplate.opsForValue().increment(getVersionKey(key));
-        if (newVersion == null) {
-            // 如果 Redis 出故障，可以做降级处理；这里简单返回
-            log.error("Redis increment version failed, key = {}", key);
-            return;
-        }
-        // 2) 根据版本号写入 Redis
+
+        // 1) 先做一次安全的 getVersion，然后 +1
+        long oldVersion = getSafeVersion(key);
+        long newVersion = oldVersion + 1;
+
+        // 2) 写回 Redis 版本号（这里存的是 newVersion，保证是 long）
+        redisTemplate.opsForValue().set(getVersionKey(key), newVersion);
+
+        // 3) 根据新版本号，拼接真正的数据键
         String realDataKey = getDataKey(key, newVersion);
         redisTemplate.opsForValue().set(realDataKey, value, CACHE_EXPIRE_MINUTES, TimeUnit.MINUTES);
 
-        // 3) 写入本地缓存（记录数据和最新版本号）
+        // 4) 写入本地缓存（Key 拼上最新版本号），也用 Long
+        String localKey = getLocalKey(key, newVersion);
         CacheValue cacheValue = new CacheValue(value, newVersion);
-        localCache.put(key, cacheValue);
+        localCache.put(localKey, cacheValue);
     }
 
     /**
      * 读缓存
-     * 1. 先从 Redis 获取最新版本号
-     * 2. 本地缓存若版本号一致，则直接返回
-     * 3. 否则从 Redis 获取最新值，回填本地缓存
-     *
-     * @param key 业务键
-     * @return 对应的值 or null
      */
     public Object get(String key) {
         if (key == null) {
             return null;
         }
-        // 1) 获取 Redis 中的最新版本号
-        Object versionObj = redisTemplate.opsForValue().get(getVersionKey(key));
-        if (versionObj == null) {
-            // 版本号都没有，说明还没写入过，可能缓存不存在
-            return null;
-        }
-        long redisVersion;
-        try {
-            redisVersion = Long.parseLong(versionObj.toString());
-        } catch (NumberFormatException e) {
-            log.error("version parse error, key = {}, version = {}", key, versionObj);
+        // 1) 读出 Redis 最新版本号（确保是 long）
+        long redisVersion = getSafeVersion(key);
+        if (redisVersion <= 0) {
+            // 说明还没写入过
             return null;
         }
 
-        // 2) 查看本地缓存里的缓存值
-        CacheValue localValue = localCache.getIfPresent(key);
-        if (localValue != null && localValue.getVersion() == redisVersion) {
-            // 版本一致，直接返回本地缓存的数据
+        // 2) 拿到本地缓存 key
+        String localKey = getLocalKey(key, redisVersion);
+        CacheValue localValue = localCache.getIfPresent(localKey);
+        if (localValue != null) {
+            // 有值且版本一致，直接返回
             return localValue.getData();
         }
 
-        // 3) 版本不一致或本地无缓存，则从 Redis 重新获取
+        // 3) 不一致或本地无缓存，则从 Redis 取
         String realDataKey = getDataKey(key, redisVersion);
         Object redisValue = redisTemplate.opsForValue().get(realDataKey);
         if (redisValue != null) {
             // 回填本地缓存
             CacheValue newCacheValue = new CacheValue(redisValue, redisVersion);
-            localCache.put(key, newCacheValue);
+            localCache.put(localKey, newCacheValue);
         }
         return redisValue;
     }
 
     /**
      * 删除缓存
-     * 1. 删除本地缓存
-     * 2. 删除 Redis 中版本号键 + 最新数据键
-     *
-     * @param key 业务键
      */
     public void delete(String key) {
         if (key == null) {
             return;
         }
-        // 1) 删除本地缓存
-        localCache.invalidate(key);
-
-        // 2) 获取 Redis 中最新版本号
-        Object versionObj = redisTemplate.opsForValue().get(getVersionKey(key));
-        if (versionObj != null) {
-            long redisVersion;
-            try {
-                redisVersion = Long.parseLong(versionObj.toString());
-            } catch (NumberFormatException e) {
-                log.error("delete parse version error, key = {}, version = {}", key, versionObj);
-                return;
-            }
-            // 删除 data
+        // 1) 获取 Redis 中最新版本号（安全方式）
+        long redisVersion = getSafeVersion(key);
+        if (redisVersion > 0) {
+            // 2) 删除 Redis 中的数据
             String realDataKey = getDataKey(key, redisVersion);
             redisTemplate.delete(realDataKey);
+
+            // 3) 删除本地缓存
+            String localKey = getLocalKey(key, redisVersion);
+            localCache.invalidate(localKey);
         }
-        // 删除 version
+        // 4) 最后删除版本号
         redisTemplate.delete(getVersionKey(key));
     }
 
     /**
+     * 统一获取 version，避免 Integer / Long 混用
+     */
+    private long getSafeVersion(String key) {
+        Object versionObj = redisTemplate.opsForValue().get(getVersionKey(key));
+        if (versionObj instanceof Number) {
+            return ((Number) versionObj).longValue();
+        }
+        return 0L;
+    }
+
+    /**
      * 拼接版本号键
-     * 形如：cache:version:{key}
-     *
-     * @param key 原始业务键
-     * @return redis 中存放 version 的键
      */
     private String getVersionKey(String key) {
         return REDIS_VERSION_PREFIX + key;
@@ -161,18 +131,20 @@ public class CacheManager {
 
     /**
      * 拼接数据键
-     * 形如：cache:data:{key}:{version}
-     *
-     * @param key     原始业务键
-     * @param version 缓存版本号
-     * @return redis 中实际存放数据的键
      */
     private String getDataKey(String key, long version) {
         return REDIS_DATA_PREFIX + key + ":" + version;
     }
 
     /**
-     * 用于本地缓存的数据容器，包含“真正的数据”和“版本号”
+     * 拼接本地缓存键（带版本号）
+     */
+    private String getLocalKey(String key, long version) {
+        return key + ":" + version;
+    }
+
+    /**
+     * 本地缓存的数据容器
      */
     private static class CacheValue {
         private final Object data;
@@ -182,14 +154,15 @@ public class CacheManager {
             this.data = data;
             this.version = version;
         }
-
         public Object getData() {
             return data;
         }
-
         public long getVersion() {
             return version;
         }
     }
 
+    public RedisTemplate<String, Object> getRedisTemplate() {
+        return this.redisTemplate;
+    }
 }

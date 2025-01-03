@@ -24,7 +24,7 @@ import com.extazy.web.manager.CacheManager;
 import com.extazy.web.manager.CosManager;
 import com.extazy.maker.meta.Meta;
 import com.extazy.web.model.dto.generator.*;
-import com.extazy.web.model.entity.Generator;
+        import com.extazy.web.model.entity.Generator;
 import com.extazy.web.model.entity.User;
 import com.extazy.web.model.vo.GeneratorVO;
 import com.extazy.web.service.GeneratorService;
@@ -37,11 +37,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+        import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
+        import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
@@ -237,11 +237,16 @@ public class GeneratorController {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
         // 优先从缓存读取
-        String cacheKey = getPageCacheKey(generatorQueryRequest);
-        Object cacheValue = cacheManager.get(cacheKey);
-        if (cacheValue != null) {
-            return ResultUtils.success((Page<GeneratorVO>) cacheValue);
-        }
+        // 先获取最新版本号
+//        Object versionObj = cacheManager.getRedisTemplate().opsForValue().get("cache:version:generator:list:version");
+//        long version = (versionObj instanceof Number) ? ((Number) versionObj).longValue() : 0L;
+//
+//        // 生成分页缓存 key
+//        String cacheKey = getPageCacheKey(generatorQueryRequest, version);
+//        Object cacheValue = cacheManager.get(cacheKey);
+//        if (cacheValue != null) {
+//            return ResultUtils.success((Page<GeneratorVO>) cacheValue);
+//        }
 
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
@@ -259,19 +264,21 @@ public class GeneratorController {
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
         // 写入缓存
-        cacheManager.put(cacheKey, generatorVOPage);
+//        cacheManager.put(cacheKey, generatorVOPage);
         return ResultUtils.success(generatorVOPage);
     }
 
     private void updateGeneratorListCacheVersion() {
-        // 这里简单调用 cacheManager.put()，令其自增 version
-        // 不过因为它本身是一个普通 key，你需要先从 cacheManager 拿到旧值 + 1
-        Long oldVersion = (Long) cacheManager.get(GENERATOR_LIST_VERSION_KEY);
-        if (oldVersion == null) {
-            oldVersion = 0L;
+        Object versionObj = cacheManager.getRedisTemplate().opsForValue().get("cache:version:generator:list:version");
+        long oldVer = 0L;
+        if (versionObj instanceof Number) {
+            oldVer = ((Number) versionObj).longValue();
         }
-        Long newVersion = oldVersion + 1;
-        cacheManager.put(GENERATOR_LIST_VERSION_KEY, newVersion);
+        long newVer = oldVer + 1;
+        cacheManager.getRedisTemplate().opsForValue().set("cache:version:generator:list:version", newVer);
+
+        // 缓解本地缓存失效问题
+        cacheManager.delete("generator:list:version");
     }
 
     /**
@@ -641,11 +648,11 @@ public class GeneratorController {
     }
 
 
-    private static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+    private static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest, Long version) {
         String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
         // 编码请求参数
         String base64 = Base64Encoder.encode(jsonStr);
-        String key = "generator:page:" + base64;
+        String key = "generator:page:" + version + base64;
 
         return key;
     }
@@ -728,7 +735,7 @@ public class GeneratorController {
         // 6) 组装一个 Generator，把 meta.fileConfig 序列化后赋值给 generator.fileConfig
         Generator generator = new Generator();
         // generator.setName("parsed-template");  // 看需求
-        // 直接把 `meta.fileConfig` 写入 generator.fileConfig (JSON)
+        // 直接把 meta.fileConfig 写入 generator.fileConfig (JSON)
         generator.setFileConfig(JSONUtil.toJsonStr(meta.getFileConfig()));
 
         // 如果想写更多字段，也可以
