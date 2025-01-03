@@ -1,5 +1,5 @@
-import { CloseOutlined } from '@ant-design/icons';
-import { Button, Card, Form, FormListFieldData, Input, Space } from 'antd';
+import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Card, Form, FormListFieldData, Input, Space, Upload, message } from 'antd';
 
 interface Props {
   formRef: any;
@@ -8,6 +8,26 @@ interface Props {
 
 export default (props: Props) => {
   const { formRef, oldData } = props;
+
+  // 处理 JSON 文件上传并解析
+  const handleJsonUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const jsonData = JSON.parse(e.target?.result as string);
+
+        // 假设 JSON 数据结构与表单字段映射对应
+        const modelConfig = jsonData?.modelConfig || {};
+        formRef.current?.setFieldsValue({ modelConfig });
+
+        message.success('JSON 数据已成功加载到表单！');
+      } catch (error) {
+        message.error('JSON 文件解析失败，请检查文件内容！');
+      }
+    };
+    reader.readAsText(file);
+    return false; // 阻止上传行为
+  };
 
   /**
    * 单个表单字段填写视图
@@ -43,6 +63,8 @@ export default (props: Props) => {
   );
 
   return (
+    <div>
+
     <Form.List name={['modelConfig', 'models']}>
       {(fields, { add, remove }) => (
         <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
@@ -122,9 +144,29 @@ export default (props: Props) => {
           >
             添加分组
           </Button>
+
+          {/* 添加 JSON 上传按钮 */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 16, // 可调整与其他内容的间距
+            }}
+          >
+            <Upload
+              accept=".json"
+              beforeUpload={handleJsonUpload}
+              showUploadList={false}
+            >
+              <Button icon={<UploadOutlined />}>上传 JSON 文件</Button>
+            </Upload>
+          </div>
+
           <div style={{ marginBottom: 16 }} />
         </div>
       )}
     </Form.List>
+    </div>
   );
 };
